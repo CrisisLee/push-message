@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.playhudong.dao.MessageMapper">
+	<resultMap id="baseResultMap" type="com.playhudong.model.Message">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="to_users" property="toUsers" jdbcType="INTEGER" />
+		<result column="channel" property="channel" jdbcType="INTEGER" />
+		<result column="push_time" property="pushTime" jdbcType="TIMESTAMP" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="create_user" property="createUser" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="cron_expression" property="cronExpression"
+			jdbcType="VARCHAR" />
+		<result column="pushed_count" property="pushedCount" jdbcType="INTEGER" />
+		<result column="push_type" property="pushType" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, title, content, to_users, channel, status, create_time,
+		create_user, push_type
+	</sql>
+	
+	<select id="selectByPrimaryKey" resultMap="baseResultMap"
+		parameterType="java.lang.Integer">
+		select * from t_message where id = #{id}
+	</select>
+	
+	<select id="selectAll" resultMap="baseResultMap">
+		select * from t_message
+	</select>
+	
+	<insert id="insertSelective" parameterType="com.playhudong.model.Message">
+		<if test="pushType==0">
+			insert into t_message(id, title, content, to_users,
+			channel, push_time, status, create_time, create_user, update_time,
+			push_type) values (#{id},#{title},#{content},#{toUsers},
+			#{channel},#{pushTime},#{status},#{createTime}, #{createUser},
+			#{updateTime},#{pushType})
+		</if>
+		<if test="pushType==1">
+			insert into t_message(id, title, content, to_users,
+			channel, status, create_time, create_user, update_time,cron_expression,
+			pushed_count, push_type) values (#{id},#{title}, #{content},
+			#{toUsers}, #{channel},#{status}, #{createTime}, #{createUser},
+			#{updateTime}, #{cronExpression}, #{pushedCount}, #{pushType})
+		</if>
+		
+	</insert>
+	
+</mapper>

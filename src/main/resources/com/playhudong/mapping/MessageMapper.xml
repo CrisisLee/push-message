@@ -22,16 +22,16 @@
 		id, title, content, to_users, channel, status, create_time,
 		create_user, push_type
 	</sql>
-	
+
 	<select id="selectByPrimaryKey" resultMap="baseResultMap"
 		parameterType="java.lang.Integer">
 		select * from t_message where id = #{id}
 	</select>
-	
+
 	<select id="selectAll" resultMap="baseResultMap">
 		select * from t_message
 	</select>
-	
+
 	<insert id="insertSelective" parameterType="com.playhudong.model.Message">
 		<if test="pushType==0">
 			insert into t_message(id, title, content, to_users,
@@ -42,12 +42,40 @@
 		</if>
 		<if test="pushType==1">
 			insert into t_message(id, title, content, to_users,
-			channel, status, create_time, create_user, update_time,cron_expression,
-			pushed_count, push_type) values (#{id},#{title}, #{content},
-			#{toUsers}, #{channel},#{status}, #{createTime}, #{createUser},
-			#{updateTime}, #{cronExpression}, #{pushedCount}, #{pushType})
+			channel, status, create_time, create_user,
+			update_time,cron_expression,
+			pushed_count, push_type) values
+			(#{id},#{title}, #{content},
+			#{toUsers}, #{channel},#{status},
+			#{createTime}, #{createUser},
+			#{updateTime}, #{cronExpression},
+			#{pushedCount}, #{pushType})
 		</if>
-		
+
 	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.playhudong.model.Message">
+		update
+		t_message
+		set title = #{title}, content = #{content},
+		to_users = #{toUsers},
+		channel = #{channel},
+		update_time = #{updateTime},
+		push_type = #{pushType},
+		push_time = #{pushTime},
+		cron_expression = #{cronExpression},
+		pushed_count = #{pushedCount}
+		where id = #{id}
+	</update>
 	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from t_message where id = #{id}
+	
+	</delete>
+	
+
+	<update id="updateStatus">
+		update t_message set status = #{newStatus} where id = #{id}
+	</update>
+
 </mapper>

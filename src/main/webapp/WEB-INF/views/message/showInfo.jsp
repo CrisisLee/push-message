@@ -50,9 +50,23 @@
 						<c:if test="${message.cronExpression==null}">--</c:if></td>
 					<td align="center"><c:if test="${message.pushedCount!=-1}">${message.pushedCount}</c:if>
 						<c:if test="${message.pushedCount==-1}">--</c:if></td>
-					<td align="center"><a>加入推送列表</a></td>
-					<td align="center"><a>修改</a></td>
-					<td align="center"><a>删除</a></td>
+					<td align="center">
+						<c:if test="${message.status==0 }">
+							<a href="addToPushList.htmls?id=${message.id }">加入推送列表</a>
+						</c:if>
+						<c:if test="${message.status==1 }">
+							加入推送列表
+						</c:if>
+					</td>
+					<td align="center">
+						<c:if test="${message.status==0 }">
+							<a href="updatePage.htmls?id=${message.id }">修改</a>
+						</c:if>
+						<c:if test="${message.status==1 }">
+							修改
+						</c:if>
+					</td>
+					<td align="center"><a href="deleteMessage.htmls?id=${message.id }">删除</a></td>
 				</tr>
 			</c:forEach>
 

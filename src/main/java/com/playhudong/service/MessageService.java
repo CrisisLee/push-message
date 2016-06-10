@@ -14,4 +14,10 @@ public interface MessageService {
 	
 	int getMaxId();
 	
+	int update(Message message);
+	
+	int delete(int id);
+	
+	int addToPushList(int id);
+	
 }

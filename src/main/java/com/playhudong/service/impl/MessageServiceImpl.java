@@ -44,5 +44,20 @@ public class MessageServiceImpl implements MessageService{
 			
 		return maxId + 1;
 	}
+	
+	public int update(Message message) {
+		return messageMapper.updateByPrimaryKey(message);
+	}
+
+	public int delete(int id) {
+		// TODO Auto-generated method stub
+		return messageMapper.deleteByPrimaryKey(id);
+	}
+
+	public int addToPushList(int id) {
+		// TODO Auto-generated method stub
+		return messageMapper.updateStatus(id, 1);
+	}
+	
 
 }

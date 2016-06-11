@@ -40,16 +40,18 @@
 			#{channel},#{pushTime},#{status},#{createTime}, #{createUser},
 			#{updateTime},#{pushType})
 		</if>
+		<!-- if it is an advanced message, we calculate the next push-time
+			and save it as push_time column -->
 		<if test="pushType==1">
 			insert into t_message(id, title, content, to_users,
 			channel, status, create_time, create_user,
 			update_time,cron_expression,
-			pushed_count, push_type) values
+			pushed_count, push_type, push_time) values
 			(#{id},#{title}, #{content},
 			#{toUsers}, #{channel},#{status},
 			#{createTime}, #{createUser},
 			#{updateTime}, #{cronExpression},
-			#{pushedCount}, #{pushType})
+			#{pushedCount}, #{pushType}, #{pushTime})
 		</if>
 
 	</insert>
@@ -77,5 +79,10 @@
 	<update id="updateStatus">
 		update t_message set status = #{newStatus} where id = #{id}
 	</update>
+	
+	<select id="selectByPushType">
+		select * from t_message where push_type = #{pushType} and TO_DAYS(push_time) = TO_DAYS(#{currentDay})
+	
+	</select>
 
 </mapper>

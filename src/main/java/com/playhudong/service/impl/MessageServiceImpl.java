@@ -1,7 +1,11 @@
 package com.playhudong.service.impl;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
+import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +24,18 @@ public class MessageServiceImpl implements MessageService{
 		return messageMapper.selectByPrimaryKey(id);
 	}
 
+	public List<Message> getAdavancedMessages() {
+		// TODO Auto-generated method stub
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		return messageMapper.selectByPushType(Message.ADVANCED, timestamp);
+	}
+	
+	public List<Message> getOrdinaryMessages() {
+		// TODO Auto-generated method stub
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		return messageMapper.selectByPushType(Message.ORDINARY, timestamp);
+	}
+	
 	public List<Message> getMessages() {
 		// TODO Auto-generated method stub
 		return messageMapper.selectAll();
@@ -27,6 +43,22 @@ public class MessageServiceImpl implements MessageService{
 
 	public int insert(Message message) {
 		// TODO Auto-generated method stub
+		
+		//if it is an advanced message, calculate next push-time
+		if(!message.isOrdinary()) {
+			CronExpression cronExpression = null;
+			Date nextPushTime = null;
+			try {
+				cronExpression = new CronExpression(message.getCronExpression());
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+				nextPushTime = cronExpression.getNextValidTimeAfter(new Date(System.currentTimeMillis()));
+				message.setPushTime(new Timestamp(nextPushTime.getTime()));
+			}
+			
+		}
 		return messageMapper.insertSelective(message);
 	}
 

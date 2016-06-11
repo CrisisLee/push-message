@@ -3,9 +3,11 @@ package com.playhudong.util;
 import java.sql.Timestamp;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.playhudong.dao.MessageMapper;
 import com.playhudong.model.Message;
 
 /**
@@ -23,10 +25,15 @@ public class TaskManager {
 
 	//messages to be pushed today
 	//ranked by time-to-be-pushed
-	private static PriorityBlockingQueue<Message> pushList = null;
+	private static PriorityBlockingQueue<Message> pushList = new PriorityBlockingQueue<Message>();
+	
+	@Autowired
+	private MessageMapper messageMapper;
 	
 	@Scheduled(fixedRate = 3000)
 	public void scanOrdinaryMessages() {
+		
+		
 		System.out.println("executing ori...");
 	}
 	
@@ -40,16 +47,21 @@ public class TaskManager {
 		System.out.println("executing ada...");
 	}
 	
+
 	/**
 	 * once we send a message, we get another
 	 * from the queue, and wait for time to push
 	 * it
 	 */
-	@Scheduled(fixedDelay = 0)
+	
+	@Scheduled(fixedDelay = 1000L)
 	public void sendMessages() {
+		
+		System.out.println("balabala");
 		Message message = null;
 		try {
 			message = pushList.take();
+			System.out.println("not gonna happen");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			System.out.println(1);

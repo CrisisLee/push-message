@@ -38,8 +38,8 @@
 					<td align="center">${message.content}</td>
 					<td align="center">${message.toUsers}</td>
 					<td align="center">${message.channel}</td>
-					<td align="center"><c:if test="${message.pushTime!=null}">${message.pushTime}</c:if>
-						<c:if test="${message.pushTime==null}">--</c:if></td>
+					<td align="center"><c:if test="${message.pushType==0}">${message.pushTime}</c:if>
+						<c:if test="${message.pushType==1}">--</c:if></td>
 					<td align="center">${message.status}</td>
 					<td align="center">${message.createUser}</td>
 					<td align="center">${message.createTime}</td>

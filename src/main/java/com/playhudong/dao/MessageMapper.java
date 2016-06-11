@@ -1,5 +1,6 @@
 package com.playhudong.dao;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -21,4 +22,6 @@ public interface MessageMapper {
 	List<Message> selectAll();
 	
 	int updateStatus(@Param("id") int id, @Param("newStatus") int newStatus);
+	
+	List<Message> selectByPushType(@Param("pushType") int pushType, @Param("currentDay") Timestamp currentDay);
 }

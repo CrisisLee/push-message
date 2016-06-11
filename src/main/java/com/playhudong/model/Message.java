@@ -7,10 +7,12 @@ package com.playhudong.model;
  */
 import java.sql.Timestamp;
 
-public class Message {
+public class Message implements Comparable<Message> {
 
+	public static final int ORDINARY = 0;
+	public static final int ADVANCED = 1;
 
-
+	
 	private final int id;
 	private final Timestamp createTime;
 	private final String createUser;
@@ -27,6 +29,8 @@ public class Message {
 	private String cronExpression;
 	private int pushedCount;
 
+	public boolean isOrdinary() { return pushType == 0; }
+	
 	/**
 	 * base constructor
 	 * 
@@ -164,6 +168,22 @@ public class Message {
 				+ ", cronExpression=" + cronExpression + ", pushedCount=" + pushedCount + "]";
 	}
 
+
+	public int compareTo(Message o) {
+		// TODO Auto-generated method stub
+		//current push-time is before O's push-time, 
+		//current priority is higher,
+		//and thus return a nagative value
+		if (getPushTime().before(o.getPushTime())) {
+			return -1;
+		} else if (getPushTime().after(o.getPushTime())) {
+			//oterwise, return a positive value
+			return 1;
+		}
+		
+		return 0;
+	}
+	
 	public static void main(String[] args) {
 
 
@@ -260,5 +280,6 @@ public class Message {
 	public String getCreateUser() {
 		return createUser;
 	}
+
 
 }

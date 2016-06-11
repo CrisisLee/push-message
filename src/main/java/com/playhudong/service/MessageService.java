@@ -19,5 +19,9 @@ public interface MessageService {
 	int delete(int id);
 	
 	int addToPushList(int id);
+
+	List<Message> getAdavancedMessages();
+	
+	List<Message> getOrdinaryMessages();
 	
 }

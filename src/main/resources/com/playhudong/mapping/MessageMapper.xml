@@ -62,6 +62,7 @@
 		set title = #{title}, content = #{content},
 		to_users = #{toUsers},
 		channel = #{channel},
+		status = #{status},
 		update_time = #{updateTime},
 		push_type = #{pushType},
 		push_time = #{pushTime},
@@ -80,9 +81,9 @@
 		update t_message set status = #{newStatus} where id = #{id}
 	</update>
 	
-	<select id="selectByPushType">
-		select * from t_message where push_type = #{pushType} and TO_DAYS(push_time) = TO_DAYS(#{currentDay})
-	
+	<select id="selectByPushType" resultType="com.playhudong.model.Message">
+		select * from t_message where push_type = #{pushType} and 
+		<![CDATA[TO_DAYS(push_time) = TO_DAYS(#{currentDay}) and status < 2]]>
 	</select>
 
 </mapper>

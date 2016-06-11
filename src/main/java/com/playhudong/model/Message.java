@@ -11,6 +11,12 @@ public class Message implements Comparable<Message> {
 
 	public static final int ORDINARY = 0;
 	public static final int ADVANCED = 1;
+	
+	public static final int STATUS_EDITABLE = 0;
+	public static final int STATUS_READYTOPUSH = 1;
+	public static final int STATUS_GOINGTOPUSH = 2;
+	public static final int STATUS_PUSHED = 3;
+	public static final int STATUS_FAILTOPUSH = 4;
 
 	
 	private final int id;

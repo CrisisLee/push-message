@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.playhudong.model.Message;
 import com.playhudong.service.MessageService;
+import com.playhudong.util.TaskManager;
 
 @Controller
 @RequestMapping("/message")
@@ -142,6 +143,9 @@ public class MessageController {
 	@RequestMapping("/deleteMessage")
 	public String deleteMessage(@RequestParam("id") final int id) {
 		messageService.delete(id);
+		//remove the message if it is in the push-list
+		TaskManager.removeFormPushList(id);
+		
 		return "redirect:/message/showInfo.htmls";
 	}
 	

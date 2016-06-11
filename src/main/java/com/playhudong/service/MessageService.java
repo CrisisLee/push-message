@@ -24,4 +24,10 @@ public interface MessageService {
 	
 	List<Message> getOrdinaryMessages();
 	
+	int updateAfterPush(Message message, boolean pushed);
+	
+	int setMessageListStatus(List<Message> messages, int status);
+	
+	int setMessageStatus(Message message, int status);
+	
 }

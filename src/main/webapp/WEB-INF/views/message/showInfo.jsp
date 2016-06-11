@@ -54,7 +54,7 @@
 						<c:if test="${message.status==0 }">
 							<a href="addToPushList.htmls?id=${message.id }">加入推送列表</a>
 						</c:if>
-						<c:if test="${message.status==1 }">
+						<c:if test="${message.status>=1 }">
 							加入推送列表
 						</c:if>
 					</td>
@@ -62,7 +62,7 @@
 						<c:if test="${message.status==0 }">
 							<a href="updatePage.htmls?id=${message.id }">修改</a>
 						</c:if>
-						<c:if test="${message.status==1 }">
+						<c:if test="${message.status>0 }">
 							修改
 						</c:if>
 					</td>

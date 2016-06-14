@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.playhudong.dao.AdvancedPushLogMapper">
+
+	<resultMap id="baseResultMap" type="com.playhudong.model.AdvancedPushLog">
+		<id column="message_id" property="messageId" jdbcType="INTEGER" />
+		<result column="pushed_count" property="pushedCount" jdbcType="INTEGER" />
+		<result column="last_push_time" property="lastPushTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<insert id="insert" parameterType="com.playhudong.model.AdvancedPushLog">
+		insert into
+		t_advanced_push_log(message_id,
+		pushed_count, last_push_time)
+		values(#{messageId}, #{pushedCount}, #{lastPushTime})
+
+	</insert>
+
+	<select id="selectAll" resultMap="baseResultMap">
+		select * from
+		t_advanced_push_log
+	</select>
+
+	<update id="updateByMessageId" parameterType="com.playhudong.model.AdvancedPushLog">
+		update
+		t_advanced_push_log set
+		pushed_count = #{pushedCount}, last_push_time =
+		#{lastPushTime}
+		where message_id =
+		#{messageId}
+	</update>
+
+	<select id="selectByMessageId" parameterType="java.lang.Integer"
+		resultMap="baseResultMap">
+		select * from t_advanced_push_log where message_id = #{messageId} 
+	</select>
+
+
+</mapper>

@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.playhudong.model.Message;
 import com.playhudong.service.MessageService;
+import com.playhudong.service.PushLogService;
 import com.playhudong.util.TaskManager;
 
 @Controller
@@ -25,6 +26,9 @@ public class MessageController {
 
 	@Autowired
 	private MessageService messageService;
+	
+	@Autowired
+	private PushLogService pushLogService;
 
 	@RequestMapping("/showInfo")
 	public String showMessage(ModelMap modelMap) {
@@ -41,7 +45,17 @@ public class MessageController {
 	@RequestMapping("/addMessage")
 	public ModelAndView addMessage(HttpServletRequest request) {
 
-		int id = messageService.getMaxId();
+		//if someone delete a message from t_message, and meanwhile the message has the largest id,
+		//but the record in t_push_log was not deleted, then we will encounter a conflict.
+		//so we should at the same time find the max id in both tables.
+		int maxFromMessage = messageService.getMaxId();
+		int maxFromLog = pushLogService.getMaxId();
+		int id = -1;
+		if (maxFromLog > maxFromMessage)
+			id = maxFromLog;
+		else
+			id = maxFromMessage;
+		
 		String title = request.getParameter("title");
 		String content = request.getParameter("content");
 		int toUsers = Integer.parseInt(request.getParameter("toUsers"));

@@ -9,8 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.playhudong.model.AdvancedPushLog;
 import com.playhudong.model.Message;
+import com.playhudong.model.PushLog;
+import com.playhudong.service.AdvancedPushLogService;
 import com.playhudong.service.MessageService;
+import com.playhudong.service.PushLogService;
 
 /**
  * includes 3 tasks 1st is to scan the oridinary messages in db 2nd is to scan
@@ -30,6 +34,12 @@ public class TaskManager {
 
 	@Autowired
 	private MessageService messageService;
+	
+	@Autowired 
+	PushLogService pushLogService;
+	
+	@Autowired 
+	AdvancedPushLogService advancedPushLogService;
 
 	@Scheduled(fixedRate = 3000)
 	public void scanOrdinaryMessages() {
@@ -50,7 +60,11 @@ public class TaskManager {
 	public void scanAdavancedMessages() {
 		List<Message> messages = messageService.getAdavancedMessages();
 		if (messages.size() > 0) {
-			pushList.addAll(messages);
+			for(Message message : messages) {
+				if (!pushList.contains(message)) {
+					pushList.add(message);
+				}
+			}
 			// change the messages' status into going-to-push
 			messageService.setMessageListStatus(messages, Message.STATUS_GOINGTOPUSH);
 		}
@@ -88,6 +102,33 @@ public class TaskManager {
 			}
 			// current time is after push-time, push it
 			boolean pushed = sendMessage(message, message.getChannel());
+			//push log
+			int id = pushLogService.getMaxId();
+			int status = pushed ? PushLog.STATUS_SUCCESS : PushLog.STATUS_FAILED;
+			Timestamp current = new Timestamp(System.currentTimeMillis());
+			PushLog pushLog = new PushLog(id, message.getId(), current, status);
+			pushLogService.insert(pushLog);
+			
+			//if it is an advanced message, make an advanced push-log, or update one instead
+			if(message.getPushType() == Message.ADVANCED) {
+				//current message has appeared in db before, update it
+				if(advancedPushLogService.existsMessageLog(message.getId())) {
+					AdvancedPushLog advancedPushLog = advancedPushLogService.getAdvancedPushLogById(message.getId());
+					advancedPushLog.setLastPushTime(current);
+					//pushed successfully, pushed-count + 1
+					//else, do nothing
+					int pushedCount = pushed ? 1 : 0;		
+					advancedPushLog.setPushedCount(advancedPushLog.getPushedCount() + pushedCount);
+					//update in db
+					advancedPushLogService.update(advancedPushLog);
+					
+				}
+				//has-not appeared before, insert a new one
+				else {
+					advancedPushLogService.insert(new AdvancedPushLog(message.getId(), current));
+				}
+				
+			}
 			// after pushing a message, update its status, success of fail
 			messageService.updateAfterPush(message, pushed);
 

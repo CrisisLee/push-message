@@ -11,7 +11,7 @@
 	
 	<insert id="insert" parameterType="com.playhudong.model.PushLog">
 		insert into t_push_log(id,
-		message_id, push_time, status) values (#{id}, #{messageId},
+		message_id, push_time, status) values (null , #{messageId},
 		#{pushTime}, #{status})
 	</insert>
 

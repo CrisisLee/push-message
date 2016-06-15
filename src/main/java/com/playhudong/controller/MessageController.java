@@ -2,6 +2,7 @@ package com.playhudong.controller;
 
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.playhudong.model.Message;
 import com.playhudong.service.MessageService;
-import com.playhudong.service.PushLogService;
 import com.playhudong.util.TaskManager;
 
 @Controller
@@ -26,9 +26,6 @@ public class MessageController {
 
 	@Autowired
 	private MessageService messageService;
-	
-	@Autowired
-	private PushLogService pushLogService;
 
 	@RequestMapping("/showInfo")
 	public String showMessage(ModelMap modelMap) {
@@ -45,17 +42,6 @@ public class MessageController {
 	@RequestMapping("/addMessage")
 	public ModelAndView addMessage(HttpServletRequest request) {
 
-		//if someone delete a message from t_message, and meanwhile the message has the largest id,
-		//but the record in t_push_log was not deleted, then we will encounter a conflict.
-		//so we should at the same time find the max id in both tables.
-		int maxFromMessage = messageService.getMaxId();
-		int maxFromLog = pushLogService.getMaxId();
-		int id = -1;
-		if (maxFromLog > maxFromMessage)
-			id = maxFromLog;
-		else
-			id = maxFromMessage;
-		
 		String title = request.getParameter("title");
 		String content = request.getParameter("content");
 		int toUsers = Integer.parseInt(request.getParameter("toUsers"));
@@ -75,16 +61,17 @@ public class MessageController {
 			int hour = Integer.parseInt(temp[3]);
 			int minute = Integer.parseInt(temp[4]);
 			int second = Integer.parseInt(temp[5]);
-			@SuppressWarnings("deprecation")
-			Timestamp pushTime = new Timestamp(year, month, day, hour, minute, second, 0);
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(year, month, day, hour, minute, second);
+			Timestamp pushTime = new Timestamp(calendar.getTimeInMillis());
 			
 			createTime = new Timestamp(System.currentTimeMillis());
-			message = new Message(id, createTime, "lxd", title, content, toUsers, channel, 0, pushType, createTime);
+			message = new Message(createTime, "lxd", title, content, toUsers, channel, 0, pushType, pushTime);
 
 		} else {// case advanced message
 			String cronExpression = request.getParameter("cronExpression");
 			createTime = new Timestamp(System.currentTimeMillis());
-			message = new Message(id, createTime, "lxd", title, content, toUsers, channel, 0, pushType,
+			message = new Message(createTime, "lxd", title, content, toUsers, channel, 0, pushType,
 					cronExpression);
 
 		}

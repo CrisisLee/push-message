@@ -36,7 +36,7 @@
 		<if test="pushType==0">
 			insert into t_message(id, title, content, to_users,
 			channel, push_time, status, create_time, create_user, update_time,
-			push_type) values (#{id},#{title},#{content},#{toUsers},
+			push_type) values (null ,#{title},#{content},#{toUsers},
 			#{channel},#{pushTime},#{status},#{createTime}, #{createUser},
 			#{updateTime},#{pushType})
 		</if>
@@ -47,7 +47,7 @@
 			channel, status, create_time, create_user,
 			update_time,cron_expression,
 			pushed_count, push_type, push_time) values
-			(#{id},#{title}, #{content},
+			(null ,#{title}, #{content},
 			#{toUsers}, #{channel},#{status},
 			#{createTime}, #{createUser},
 			#{updateTime}, #{cronExpression},
@@ -82,14 +82,8 @@
 	</update>
 	
 	<select id="selectByPushType" resultType="com.playhudong.model.Message">
-		<if test="pushType==0">
-			select * from t_message where push_type = #{pushType} and 
-			<![CDATA[TO_DAYS(push_time) = TO_DAYS(#{currentDay}) and status < 2]]>
-		</if>
-		<if test="pushType==1">
-			select * from t_message where push_type = #{pushType} and 
-			<![CDATA[TO_DAYS(push_time) = TO_DAYS(#{currentDay}) and status < 3]]>
-		</if>
+		select * from t_message where push_type = #{pushType} and 
+		<![CDATA[TO_DAYS(push_time) = TO_DAYS(#{currentDay}) and status < 2]]>
 	</select>
 
 </mapper>

@@ -26,8 +26,10 @@ public class PushLog {
 	//and 1 stands for failed
 	
 	
+	
+	
 	/**
-	 * 
+	 * use to read a log from db
 	 * param is Integer, cause we also use it to read data from db
 	 * @param id
 	 * @param messageId
@@ -43,6 +45,22 @@ public class PushLog {
 	}
 
 	
+	/**
+	 * when we create a log, we donot need to give an id,
+	 * cause db will produce it automatically
+	 * @param messageId
+	 * @param pushTime
+	 * @param status
+	 */
+	public PushLog(int messageId, Timestamp pushTime, int status) {
+		super();
+		this.id = -1;
+		this.messageId = messageId;
+		this.pushTime = pushTime;
+		this.status = status;
+	}
+
+
 
 	@Override
 	public String toString() {

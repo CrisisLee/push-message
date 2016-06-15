@@ -1,17 +1,16 @@
 package com.playhudong.util;
 
-import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.playhudong.model.AdvancedPushLog;
 import com.playhudong.model.Message;
-import com.playhudong.model.PushLog;
 import com.playhudong.service.AdvancedPushLogService;
 import com.playhudong.service.MessageService;
 import com.playhudong.service.PushLogService;
@@ -30,16 +29,25 @@ public class TaskManager {
 
 	// messages to be pushed today
 	// ranked by time-to-be-pushed
-	public static PriorityBlockingQueue<Message> pushList = new PriorityBlockingQueue<Message>();
+	// public static PriorityBlockingQueue<Message> pushList = new
+	// PriorityBlockingQueue<Message>();
+	public static DelayQueue<Message> pushList = new DelayQueue<Message>();
 
 	@Autowired
 	private MessageService messageService;
-	
-	@Autowired 
+
+	@Autowired
 	PushLogService pushLogService;
-	
-	@Autowired 
+
+	@Autowired
 	AdvancedPushLogService advancedPushLogService;
+
+	//A thread pool to send messages, when we get a new message to push,
+	//we will new a thread to push it.
+	//The type of thread pool needs to be checked. If we have 10000000 messages
+	//to push, we cannot create that much threads. So a fixed num thread pool may
+	//fits better.
+	public static ExecutorService executorService = Executors.newCachedThreadPool();
 
 	@Scheduled(fixedRate = 3000)
 	public void scanOrdinaryMessages() {
@@ -60,11 +68,7 @@ public class TaskManager {
 	public void scanAdavancedMessages() {
 		List<Message> messages = messageService.getAdavancedMessages();
 		if (messages.size() > 0) {
-			for(Message message : messages) {
-				if (!pushList.contains(message)) {
-					pushList.add(message);
-				}
-			}
+			pushList.addAll(messages);
 			// change the messages' status into going-to-push
 			messageService.setMessageListStatus(messages, Message.STATUS_GOINGTOPUSH);
 		}
@@ -75,63 +79,21 @@ public class TaskManager {
 	 * to push it
 	 */
 
-	@Scheduled(fixedDelay = 1000L)
+	@Scheduled(fixedDelay = 1L)
 	public void sendMessages() {
 
-		Message message = null;
-		try {
-			message = pushList.take();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			System.out.println(1);
-			e.printStackTrace();
-		} finally {
-			// only when current time is after pushtime
-			// it is time to send the message
-			while (message.getPushTime().after(new Timestamp(System.currentTimeMillis()))) {
-				try {
-					// avoid to new too much Timestamp objects...
-					// do we have a better idea?
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					System.out.println(2);
-					e.printStackTrace();
-				}
-				continue;
+		while (true) {
+			Message message = null;
+			try {
+				message = pushList.take();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				System.out.println(1);
+				e.printStackTrace();
 			}
-			// current time is after push-time, push it
-			boolean pushed = sendMessage(message, message.getChannel());
-			//push log
-			int id = pushLogService.getMaxId();
-			int status = pushed ? PushLog.STATUS_SUCCESS : PushLog.STATUS_FAILED;
-			Timestamp current = new Timestamp(System.currentTimeMillis());
-			PushLog pushLog = new PushLog(id, message.getId(), current, status);
-			pushLogService.insert(pushLog);
-			
-			//if it is an advanced message, make an advanced push-log, or update one instead
-			if(message.getPushType() == Message.ADVANCED) {
-				//current message has appeared in db before, update it
-				if(advancedPushLogService.existsMessageLog(message.getId())) {
-					AdvancedPushLog advancedPushLog = advancedPushLogService.getAdvancedPushLogById(message.getId());
-					advancedPushLog.setLastPushTime(current);
-					//pushed successfully, pushed-count + 1
-					//else, do nothing
-					int pushedCount = pushed ? 1 : 0;		
-					advancedPushLog.setPushedCount(advancedPushLog.getPushedCount() + pushedCount);
-					//update in db
-					advancedPushLogService.update(advancedPushLog);
-					
-				}
-				//has-not appeared before, insert a new one
-				else {
-					advancedPushLogService.insert(new AdvancedPushLog(message.getId(), current));
-				}
-				
-			}
-			// after pushing a message, update its status, success of fail
-			messageService.updateAfterPush(message, pushed);
-
+			SendMessageTask sendMessageTask = new SendMessageTask(pushLogService, advancedPushLogService,
+					messageService, message);
+			executorService.execute(sendMessageTask);
 		}
 
 	}
@@ -151,10 +113,4 @@ public class TaskManager {
 		}
 	}
 
-	public boolean sendMessage(Message message, int channel) {
-		// to be continued...
-		
-		System.out.println("message " + message.getId() + " pushed via channel " + channel);
-		return true;
-	}
 }

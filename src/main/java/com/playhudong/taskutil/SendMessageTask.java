@@ -1,6 +1,9 @@
-package com.playhudong.util;
+package com.playhudong.taskutil;
 
 import java.sql.Timestamp;
+
+import com.playhudong.messagesender.MessageSender;
+import com.playhudong.messagesender.MessageSenderFactory;
 import com.playhudong.model.AdvancedPushLog;
 import com.playhudong.model.Message;
 import com.playhudong.model.PushLog;
@@ -18,6 +21,7 @@ public class SendMessageTask implements Runnable {
 	
 	private Message message;
 
+	private MessageSender messageSender;
 
 
 
@@ -35,9 +39,9 @@ public class SendMessageTask implements Runnable {
 		// TODO Auto-generated method stub
 		
 		
+		messageSender = MessageSenderFactory.getMessageSender(message);
 		
-		
-		boolean pushed = sendMessage(message);
+		boolean pushed = messageSender.sendMessage(message);
 
 		// push log
 		int status = pushed ? PushLog.STATUS_SUCCESS : PushLog.STATUS_FAILED;
@@ -70,17 +74,4 @@ public class SendMessageTask implements Runnable {
 		messageService.updateAfterPush(message, pushed);
 	}
 	
-	
-	public boolean sendMessage(Message message) {
-		// to be continued...
-
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("message " + message.getId() + " pushed via channel " + message.getChannel());
-		return true;
-	}
 }

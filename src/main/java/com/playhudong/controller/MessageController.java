@@ -18,7 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.playhudong.model.Message;
 import com.playhudong.service.MessageService;
-import com.playhudong.util.TaskManager;
+import com.playhudong.taskutil.TaskManager;
 
 @Controller
 @RequestMapping("/message")

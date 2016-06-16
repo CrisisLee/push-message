@@ -20,6 +20,10 @@ public class Message implements Delayed, Comparable<Delayed> {
 	public static final int STATUS_PUSHED = 3;
 	public static final int STATUS_FAILTOPUSH = 4;
 
+	public static final int CHANNEL_WEIXIN = 0;
+	public static final int CHANNEL_WEIBO = 1;
+	public static final int CHANNEL_SMS = 2;
+	public static final int CHANNEL_EMAIL = 3;
 	
 	private final int id;
 	private final Timestamp createTime;

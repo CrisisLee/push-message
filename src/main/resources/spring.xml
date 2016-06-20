@@ -13,10 +13,13 @@
 
 	<!--引入配置属性文件 -->
 	<context:property-placeholder location="classpath:jdbc.properties" />
+	<context:property-placeholder location="classpath:mail.properties" />
 
 	<!--自动扫描含有@Service将其注入为bean -->
 	<context:component-scan base-package="com.playhudong.service" />
+	<context:component-scan base-package="com.playhudong.taskutil" />
 	<context:component-scan base-package="com.playhudong.util" />
+	<context:component-scan base-package="com.playhudong.messagesender" />
 	
 	<context:annotation-config />
 	<task:annotation-driven scheduler="qbScheduler" mode="proxy"/>

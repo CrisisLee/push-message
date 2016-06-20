@@ -49,9 +49,9 @@ public class TaskManager {
 	//fits better.
 	public static ExecutorService executorService = Executors.newCachedThreadPool();
 
-	@Scheduled(fixedRate = 3000)
+	@Scheduled(fixedRate = 3000L)
 	public void scanOrdinaryMessages() {
-
+		System.out.println("进行一次普通扫描");
 		List<Message> messages = messageService.getOrdinaryMessages();
 		if (messages.size() > 0) {
 			pushList.addAll(messages);
@@ -64,8 +64,9 @@ public class TaskManager {
 	 * when get an adavanced message, convert it into an ordinary one, for
 	 * convenience of sending them
 	 */
-	@Scheduled(fixedRate = 3000)
+	@Scheduled(fixedRate = 3000L)
 	public void scanAdavancedMessages() {
+		System.out.println("进行一次高级扫描");
 		List<Message> messages = messageService.getAdavancedMessages();
 		if (messages.size() > 0) {
 			pushList.addAll(messages);

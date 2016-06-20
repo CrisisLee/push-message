@@ -56,7 +56,7 @@ public class MessageController {
 			//use input values to construct a time_stamp for push_time
 			
 			int year = Integer.parseInt(temp[0]);
-			int month = Integer.parseInt(temp[1]);
+			int month = Integer.parseInt(temp[1]) - 1;
 			int day = Integer.parseInt(temp[2]);
 			int hour = Integer.parseInt(temp[3]);
 			int minute = Integer.parseInt(temp[4]);

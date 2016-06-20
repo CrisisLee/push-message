@@ -30,4 +30,6 @@ public interface MessageService {
 	
 	int setMessageStatus(Message message, int status);
 	
+	
+	
 }
